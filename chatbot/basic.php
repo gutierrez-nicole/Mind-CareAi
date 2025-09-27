@@ -48,7 +48,7 @@ function detect_language($text) {
 }
 $lang = detect_language($userPrompt);
 
-$secretKey = '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';
+$secretKey = '';
 $endpoint = 'https://api.groq.com/openai/v1/chat/completions';
 
 $messages = [
