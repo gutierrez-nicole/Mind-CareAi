@@ -18,11 +18,6 @@ if (!empty($name)) {
         : strtoupper(substr($name, 0, 2));
 }
 
-// Dynamic greeting based on time
-date_default_timezone_set('America/Los_Angeles'); // Set to PST
-$hour = (int)date('H');
-$greeting = $hour < 12 ? 'Good Morning' : ($hour < 17 ? 'Good Afternoon' : 'Good Evening');
-
 require_once '../config/dbcon.php';
 
 // Fetch emergency numbers
@@ -124,36 +119,53 @@ $facebookPages = $conn->query("SELECT * FROM facebook_pages");
 
     /* Dashboard Banner */
     .dashboard-banner {
-      background: #e9ecef;
+      position: relative;
+      background: linear-gradient(rgba(0, 123, 255, 0.7), rgba(0, 123, 255, 0.7)), url('../assets/img/000.png') no-repeat center center/cover;
+      backdrop-filter: blur(8px);
       border-radius: 12px;
-      padding: 20px;
+      padding: 30px;
       margin-bottom: 20px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       animation: fadeInHero 0.8s ease-out;
       display: flex;
       align-items: center;
       justify-content: center;
       text-align: center;
+      overflow: hidden;
+    }
+    .dashboard-banner::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: inherit;
+      filter: blur(10px);
+      z-index: -1;
     }
     .dashboard-banner .banner-content {
       flex: 1;
       text-align: center;
       min-width: 200px;
+      z-index: 1;
     }
     .dashboard-banner h2 {
       font-size: 1.8em;
       font-weight: 700;
-      color: var(--primary);
+      color: #ffffff;
       margin-bottom: 10px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
       opacity: 0;
       animation: fadeInText 0.6s ease forwards;
       animation-delay: 0.2s;
     }
     .dashboard-banner p {
       font-size: 1em;
-      color: var(--card-text-color);
+      color: #f8f9fa;
       max-width: 600px;
       margin: 0 auto 15px;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
       opacity: 0;
       animation: fadeInText 0.6s ease forwards;
       animation-delay: 0.4s;
@@ -656,7 +668,7 @@ $facebookPages = $conn->query("SELECT * FROM facebook_pages");
 <div class="main">
   <div class="dashboard-banner">
     <div class="banner-content">
-      <h2><?= $greeting ?>, <?= htmlspecialchars($name) ?>!</h2>
+      <h2 id="greeting"><?= htmlspecialchars($name) ?>!</h2>
       <p>Take a moment to nurture your mind and find your inner peace.</p>
     </div>
   </div>
@@ -740,6 +752,15 @@ $facebookPages = $conn->query("SELECT * FROM facebook_pages");
 const PY_HOST = 'http://localhost:5000';
 const userId = <?= json_encode($userId) ?>;
 const sessionKey = <?= json_encode(session_id()) ?>;
+
+// Dynamic greeting based on local time
+function updateGreeting() {
+  const hour = new Date().getHours();
+  const greetingText = hour < 12 ? 'Good Morning' : (hour < 17 ? 'Good Afternoon' : 'Good Evening');
+  const name = <?= json_encode(htmlspecialchars($name)) ?>;
+  document.getElementById('greeting').innerText = `${greetingText}, ${name}!`;
+}
+window.addEventListener('DOMContentLoaded', updateGreeting);
 
 function toggleSidebar() {
   const sb = document.getElementById('sidebar');
